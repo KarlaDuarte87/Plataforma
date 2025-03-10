@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: plataforma-db-1
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: plataforma
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network  
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/plataforma
+      JWT_SECRET: your_jwt_secret
+    depends_on:
+      - db
+    networks:
+      - app-network  # Adicionado
+
+volumes:
+  db_data:
+
+networks:
+  app-network:  # Adicionado
+    driver: bridge
+
